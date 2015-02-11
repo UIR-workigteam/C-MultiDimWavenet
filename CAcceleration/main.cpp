@@ -3,7 +3,9 @@
 
 int main()
 {
-	Trainer A;
+	Wavelet W;
+	MultiD_Wavenet S = MultiD_Wavenet(2, 7, 1, W);
+	Trainer A = Trainer(S);
 
 	list<MatrixXd> Q = A.get_set("up1.csv");
 	

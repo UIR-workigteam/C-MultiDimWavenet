@@ -1,16 +1,5 @@
-#include <iostream>
-#include <fstream>
-
-#include <stdio.h>
-#include <cstdlib>
-#include <ctime>
-#include <list>
-#include "targetver.h"
-#include <iostream>
-#include <stdio.h>
-#include <tchar.h>
 #include "stdafx.h"
-
+#pragma once
 
 class Wavelet
 {

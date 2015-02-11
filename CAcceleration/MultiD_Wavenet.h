@@ -1,17 +1,12 @@
 #include "stdafx.h"
-#include <stdio.h>
-#include <cstdlib>
-#include <ctime>
-#include <list>
-#include "targetver.h"
-#include <iostream>
 #include "Wavelon.h"
+#pragma once
 
 class MultiD_Wavenet
 {
 	network_state current_state, previous_state;
 
-	std::list<network_state> history;
+	list<network_state> history;
 
 	int inp, hid, out;
 
@@ -38,8 +33,9 @@ public:
 
 	void backward(MatrixXd input, MatrixXd output, MatrixXd target);
 
+	MultiD_Wavenet();
+
 	MultiD_Wavenet(int inpt, int hidi, int outp, Wavelet mtf);
 
 	void outswap(void);
 };
-

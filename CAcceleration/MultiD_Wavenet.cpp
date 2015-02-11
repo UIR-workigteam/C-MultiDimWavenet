@@ -1,19 +1,8 @@
 // CAcceleration.cpp : Defines the entry point for the console application.
 //
-
-#include <iostream>
-#include <fstream>
-#include <Eigen/Dense>
-#include <stdio.h>
-#include <cstdlib>
-#include <ctime>
-#include <list>
-#include "targetver.h"
-#include <iostream>
-#include <stdio.h>
-#include <tchar.h>
 #include "Wavelon.h"
 #include "MultiD_Wavenet.h"
+#include <time.h>
 
 MatrixXd MultiD_Wavenet::construct_random_matrix(int nrows, int ncols, double min, double maxi)
 {
@@ -158,6 +147,10 @@ void MultiD_Wavenet::outswap(void)
 	cout << current_state.Omega << '\n' << '\n' << current_state.T << '\n' << '\n' << current_state.Lambda << '\n' << '\n' << current_state.Mu << '\n' << '\n' << current_state.Hi << std::endl;
 }
 
+MultiD_Wavenet::MultiD_Wavenet()
+{
+	MultiD_Wavenet(2, 3, 1, Wavelet());
+}
 
 
 

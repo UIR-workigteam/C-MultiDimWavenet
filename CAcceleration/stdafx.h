@@ -5,49 +5,27 @@
 
 #pragma once
 
-#include "targetver.h"
 #include <iostream>
 #include <stdio.h>
-#include <tchar.h>
 #include <Eigen/Dense>
+#include <cstdlib>
+#include <iostream>
+#include <list>
+#include <string>
 
 typedef enum { MHAT, MORLET } WaveletType;
 
 using Eigen::MatrixXd;
+using namespace std;
+#define etta 0.01
 
 struct network_state{
 	MatrixXd Mu, Omega, Hi, T, Lambda;
 	float mse = 0.0;
 };
 
-using namespace std;
+MatrixXd operator%(MatrixXd a, MatrixXd b);
 
-#define etta 0.01
-
-MatrixXd operator%(MatrixXd a, MatrixXd b)
-{
-	MatrixXd result = MatrixXd::Zero(a.rows(), a.cols());
-	for (int i = 0; i < a.rows(); i++)
-	{
-		for (int j = 0; j < a.cols(); j++)
-		{
-			result(i, j) = a(i, j) * b(i, j);
-		}
-	}
-	return result;
-}
-
-MatrixXd operator/(MatrixXd a, MatrixXd b)
-{
-	MatrixXd result = MatrixXd::Zero(a.rows(), a.cols());
-	for (int i = 0; i < a.rows(); i++)
-	{
-		for (int j = 0; j < a.cols(); j++)
-		{
-			result(i, j) = a(i, j) / b(i, j);
-		}
-	}
-	return result;
-}
+MatrixXd operator/(MatrixXd a, MatrixXd b);
 
 // TODO: reference additional headers your program requires here

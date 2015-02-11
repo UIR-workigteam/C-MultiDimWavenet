@@ -8,6 +8,11 @@
 #include "MultiD_Wavenet.h"
 #include "Trainer.h"
 
+Trainer::Trainer(MultiD_Wavenet target)
+{
+	current_wavenet = target;
+}
+
 list<MatrixXd> Trainer::get_set(string adress)
 {
 	string data(adress);

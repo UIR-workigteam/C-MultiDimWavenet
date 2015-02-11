@@ -8,6 +8,7 @@ class Trainer
 	MultiD_Wavenet current_wavenet;
 
 public:
+	Trainer::Trainer(MultiD_Wavenet target);
 	list<MatrixXd> get_set(string adress);
 
 };
