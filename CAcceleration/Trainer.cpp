@@ -35,6 +35,7 @@ list<MatrixXd> Trainer::get_set(string adress)
 		{
 			current_matrix(0, i) = atof(vec[i].c_str());
 		}
+		return_list.push_back(current_matrix);
 	}
 	return return_list;
 }
