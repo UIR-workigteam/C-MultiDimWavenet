@@ -4,6 +4,13 @@
 #include "MultiD_Wavenet.h"
 #include <time.h>
 
+void current_custom_logger(MatrixXd target)
+{
+	cout << "Watchdog. Bow-Wow!" << endl;
+	cout << target << endl;
+}
+
+
 MatrixXd MultiD_Wavenet::construct_random_matrix(int nrows, int ncols, double min, double maxi)
 {
 
@@ -90,10 +97,15 @@ network_state MultiD_Wavenet::one_step(network_state previous, network_state cur
 {
 	network_state result;
 	result.Lambda = current.Lambda + derivatives.Lambda * etta + (current.Lambda - previous.Lambda) * etta;
+	//current_custom_logger(current.Lambda + derivatives.Lambda * etta);
+	//current_custom_logger(result.Lambda);
+	//current_custom_logger((current.Lambda - previous.Lambda) * etta);
 	result.Mu = current.Mu + derivatives.Mu * etta + (current.Mu - previous.Mu) * etta;
 	result.Omega = current.Omega + derivatives.Omega * etta + (current.Omega - previous.Omega) * etta;
 	result.T = current.T + derivatives.T * etta + (current.T - previous.T) * etta;
 	result.Hi = current.Hi + derivatives.Hi * etta + (current.Hi - previous.Hi) * etta;
+	//current_custom_logger(current.Hi);
+	//current_custom_logger(derivatives.Hi * etta);
 	return result;
 }
 
@@ -108,7 +120,7 @@ void MultiD_Wavenet::backward(MatrixXd input, MatrixXd output, MatrixXd target)
 	MatrixXd current_coefficient = diagonalize(input) * current_state.Omega;
 	MatrixXd Z = motherfunction.function(current_coefficient, current_state.T, current_state.Lambda);
 	MatrixXd dZ = motherfunction.derivative(diagonalize(input) * current_state.Omega, current_state.T, current_state.Lambda);
-	MatrixXd Err = output - target;
+	MatrixXd Err = target - output;
 	MatrixXd md = replace_multiple(dZ, Z);
 	MatrixXd qm = row_multiplier(Z).transpose();
 	MatrixXd mm = make_mu(current_state.Mu * Err.transpose());
@@ -116,8 +128,8 @@ void MultiD_Wavenet::backward(MatrixXd input, MatrixXd output, MatrixXd target)
 
 
 	derivatives.Omega = md % mm % uu / current_state.Lambda;
-	derivatives.T = md % mm % current_state.T / current_state.Lambda;
-	derivatives.Lambda = md % mm % (current_coefficient - current_state.T) / current_state.Lambda;
+	derivatives.T = -1 * md % mm % current_state.T / current_state.Lambda;
+	derivatives.Lambda = -1 * md % mm % (current_coefficient - current_state.T) / current_state.Lambda;
 	derivatives.Mu = qm * Err;
 	derivatives.Hi = Err;
 
@@ -136,7 +148,7 @@ MultiD_Wavenet::MultiD_Wavenet(int inpt, int hidi, int outp, Wavelet mtf)
 	current_state.Omega = construct_random_matrix(inp, hid, 0.0, 1.0);
 	current_state.T = construct_random_matrix(inp, hid, 0.0, 1.0);
 	current_state.Lambda = construct_random_matrix(inp, hid, 0.01, 1.0);
-	current_state.Mu = construct_random_matrix(hid, out, -4.0, 4.0);
+	current_state.Mu = construct_random_matrix(hid, out, 0.0, 1.0);
 	current_state.Hi = construct_random_matrix(1, out, 0.0, 1.0);
 	previous_state = current_state;
 }
@@ -151,23 +163,3 @@ MultiD_Wavenet::MultiD_Wavenet()
 {
 	MultiD_Wavenet(2, 3, 1, Wavelet());
 }
-
-
-
-
-
-void asdamain()
-{
-	MultiD_Wavenet test(2, 7, 1, Wavelet(MHAT));
-	MatrixXd a(1, 2);
-	a << 1.0, 3.0;
-	MatrixXd b(1, 1);
-	b << 1.0;
-	MatrixXd c = test.forward(a);
-	test.outswap();
-	test.backward(a, c, b);
-	test.outswap();
-	getchar();
-
-}
-
