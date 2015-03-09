@@ -26,10 +26,19 @@ int main()
 	//getchar();
 
 	Wavelet wava(MHAT);
-	MultiD_Wavenet new_wave(2, 19, 1, wava);
-	new_wave.outswap();
-	Trainer train(new_wave, "C:/Users/Zharov/inp.csv", "C:/Users/Zharov/outp.csv");
-	MultiD_Wavenet oldschool = train.multiple_train(60);
-	oldschool.outswap();
+	Trainer train("C:/Users/Zharov/inp_1.csv", "C:/Users/Zharov/outp_1.csv");
+	MultiD_Wavenet oldschool = train.multiple_train_with_exit(2, 19, 1, wava, 600, 10, 10);
+	//oldschool.outswap();
+	getchar();
+	for (float x = -4.0; x <= 4.0; x += 1.0)
+	{
+		for (float y = -4.0; y <= 4.0; y += 1.0)
+		{
+			MatrixXd current_input(1, 2);
+			current_input(0, 0) = x;
+			current_input(0, 1) = y;
+			cout << sin(2 * x)* cos(y) << " <> " << oldschool.forward(current_input) << endl;
+		}
+	}
 	getchar();
 }
