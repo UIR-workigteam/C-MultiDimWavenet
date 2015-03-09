@@ -36,15 +36,15 @@ list<MatrixXd> Trainer::get_set(string adress)
 	string data(adress);
 	ifstream in(data.c_str());
 
-	typedef tokenizer< escaped_list_separator<char> > Tokenizer;
-
+	typedef tokenizer< char_separator<char> > Tokenizer;
+	char_separator<char> sep(",;");
 	vector< string > vec;
 	string line;
 
 	list<MatrixXd> return_list;
 	while (getline(in, line))
 	{
-		Tokenizer tok(line);
+		Tokenizer tok(line, sep);
 		vec.assign(tok.begin(), tok.end());
 
 		MatrixXd current_matrix(1, vec.size());
@@ -76,6 +76,47 @@ float Trainer::deviation(MultiD_Wavenet current_wavenet)
 		//cout << current_result << endl << validation_target[i] << endl << endl;
 	}
 	return error_sum / (float)validation_len;
+}
+
+
+void Trainer::example_comparison(MultiD_Wavenet current_wavenet)
+{
+	float error_sum = 0.0;
+	int validation_len = validation_input.size();
+	for (int i = 0; i < validation_len; i++)
+	{
+		MatrixXd current_result = current_wavenet.forward(validation_input[i]);
+		error_sum += abs((current_result - validation_target[i]).mean());
+		cout << current_result << endl << validation_target[i] << endl << endl;
+	}
+	cout << "GE = " << error_sum / (float)validation_len;
+}
+
+void Trainer::chained_example_comparison(MultiD_Wavenet current_wavenet, int chain_count)
+{
+	float error_sum = 0.0;
+	int validation_len = validation_input.size();
+	list<double> chain_ignition;
+	for (int i = 0; i < chain_count; i++)
+	{
+		chain_ignition.push_front(current_wavenet.forward(validation_input[i])(0, 0));
+	}
+
+	for (int i = chain_count; i < validation_len; i++)
+	{
+		MatrixXd temp_input = validation_input[i];
+		list<double>::iterator it = chain_ignition.begin();
+		for (int j = 0; j < chain_count; j++)
+		{
+			temp_input(0, j) = *it++;
+		}
+		MatrixXd current_result = current_wavenet.forward(temp_input);
+		chain_ignition.push_front(current_result(0, 0));
+		chain_ignition.pop_back();
+		error_sum += abs((current_result - validation_target[i]).mean());
+		cout << current_result << endl << validation_target[i] << endl << endl;
+	}
+	cout << "GE = " << error_sum / (float)validation_len;
 }
 
 MultiD_Wavenet Trainer::multiple_train(MultiD_Wavenet target, int epochs, int critical_epochs, int aeras, int critical_aeras)
@@ -175,6 +216,6 @@ MultiD_Wavenet Trainer::multiple_train_with_exit(int inp, int hid, int out, Wave
 			global_minimum_network = current_wavenet;
 		}
 	}
-	cout << "GE = " << global_error << endl;
+	chained_example_comparison(global_minimum_network, 3);
 	return global_minimum_network;
 }
