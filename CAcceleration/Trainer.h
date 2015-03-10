@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include <boost/tokenizer.hpp>
 using namespace boost;
+#pragma once
 
 class Trainer
 {

@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "Wavelon.h"
+#include <boost/tokenizer.hpp>
+using namespace boost;
 #pragma once
 
 class MultiD_Wavenet
@@ -38,4 +40,8 @@ public:
 	MultiD_Wavenet(int inpt, int hidi, int outp, Wavelet mtf);
 
 	void outswap(void);
+
+	void dump_to_file(string addr);
+
+	MultiD_Wavenet(string addr);
 };

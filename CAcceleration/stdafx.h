@@ -10,6 +10,7 @@
 #include <Eigen/Dense>
 #include <cstdlib>
 #include <iostream>
+#include <fstream>
 #include <list>
 #include <string>
 

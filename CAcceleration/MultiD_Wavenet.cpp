@@ -145,7 +145,7 @@ MultiD_Wavenet::MultiD_Wavenet(int inpt, int hidi, int outp, Wavelet mtf)
 	inp = inpt;
 	hid = hidi;
 	out = outp;
-	current_state.Omega = construct_random_matrix(inp, hid, 0.0, 1.0);
+	current_state.Omega = construct_random_matrix(inp, hid, -1.0, 1.0);
 	current_state.T = construct_random_matrix(inp, hid, 0.0, 1.0);
 	current_state.Lambda = construct_random_matrix(inp, hid, 0.01, 1.0);
 	current_state.Mu = construct_random_matrix(hid, out, 0.0, 1.0);
@@ -162,4 +162,98 @@ void MultiD_Wavenet::outswap(void)
 MultiD_Wavenet::MultiD_Wavenet()
 {
 	MultiD_Wavenet(2, 3, 1, Wavelet());
+}
+
+void MultiD_Wavenet::dump_to_file(string addr)
+{
+	ofstream myfile;
+	myfile.open(addr + ".mdwn");
+	myfile << inp << ';' << hid << ';' << out << endl;
+	myfile << current_state.Omega << endl << current_state.T << endl << current_state.Lambda << endl << current_state.Mu << endl << current_state.Hi;
+	myfile.close();
+}
+vector<string> getvector(string line)
+{
+	typedef tokenizer< char_separator<char> > Tokenizer;
+	char_separator<char> sep(" ,;");
+	vector< string > vec;
+	Tokenizer tok(line, sep);
+	vec.assign(tok.begin(), tok.end());
+	return vec;
+}
+
+MultiD_Wavenet::MultiD_Wavenet(string addr)
+{
+	ifstream myfile;
+	myfile.open(addr + ".mdwn");
+	
+	string line;
+
+	getline(myfile, line);
+	
+	vector<string> vec;
+	vec = getvector(line);
+	inp = atoi(vec[0].c_str());
+	hid = atoi(vec[1].c_str());
+	out = atoi(vec[2].c_str());
+	
+	MatrixXd tmp_Omega(inp, hid);
+	for (int i = 0; i < inp; i++)
+	{
+		getline(myfile, line);
+		vec = getvector(line);
+		for (int j = 0; j < hid; j++)
+		{
+			tmp_Omega(i, j) = atof(vec[j].c_str());
+		}
+	}
+	current_state.Omega = tmp_Omega;
+	
+	MatrixXd tmp_T(inp, hid);
+	for (int i = 0; i < inp; i++)
+	{
+		getline(myfile, line);
+		vec = getvector(line);
+		for (int j = 0; j < hid; j++)
+		{
+			tmp_T(i, j) = atof(vec[j].c_str());
+		}
+	}
+	current_state.T = tmp_T;
+
+	MatrixXd tmp_Lambda(inp, hid);
+	for (int i = 0; i < inp; i++)
+	{
+		getline(myfile, line);
+		vec = getvector(line);
+		for (int j = 0; j < hid; j++)
+		{
+			tmp_Lambda(i, j) = atof(vec[j].c_str());
+		}
+	}
+	current_state.Lambda = tmp_Lambda;
+
+	MatrixXd tmp_Mu(hid, out);
+	for (int i = 0; i < hid; i++)
+	{
+		getline(myfile, line);
+		vec = getvector(line);
+		for (int j = 0; j < out; j++)
+		{
+			tmp_Mu(i, j) = atof(vec[j].c_str());
+		}
+	}
+	current_state.Mu = tmp_Mu;
+
+	MatrixXd tmp_Hi(1, out);
+	getline(myfile, line);
+	vec = getvector(line);
+	for (int j = 0; j < out; j++)
+	{
+		tmp_Hi(0, j) = atof(vec[j].c_str());
+	}
+
+	current_state.Hi = tmp_Hi;
+	motherfunction = Wavelet(MHAT);
+	myfile.close();
 }
