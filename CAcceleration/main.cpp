@@ -3,16 +3,17 @@
 
 int main()
 {
-	MultiD_Wavenet oldschool(2, 19, 1, Wavelet(MHAT));
-	oldschool.dump_to_file("C:/Users/Zharov/test_network");
-	oldschool.outswap();
-
-	MultiD_Wavenet newschool("C:/Users/Zharov/test_network");
-	newschool.outswap();
-	//Wavelet wava(MHAT);
-	//Trainer train("C:/Users/Zharov/inp_3.csv", "C:/Users/Zharov/outp_3.csv");
-	//MultiD_Wavenet oldschool = train.multiple_train_with_exit(7, 60, 1, wava, 60, 5, 5);
+	//MultiD_Wavenet oldschool(2, 19, 1, Wavelet(MHAT));
+	//oldschool.dump_to_file("C:/Users/Zharov/test_network");
 	//oldschool.outswap();
+
+	//MultiD_Wavenet newschool("C:/Users/Zharov/test_network");
+	//newschool.outswap();
+	Wavelet wava(MHAT);
+	Trainer train("C:/Users/Zharov/inp_3.csv", "C:/Users/Zharov/outp_3.csv");
+	MultiD_Wavenet oldschool = train.multiple_train_with_exit(7, 60, 1, wava, 60, 5, 5);
+	//oldschool.outswap();
+	train.collect_output("C:/Users/Zharov/C4.csv", oldschool);
 	getchar();
 	//for (float x = -4.0; x <= 4.0; x += 1.0)
 	//{

@@ -17,4 +17,6 @@ public:
 	float deviation(MultiD_Wavenet current_wavenet);
 	MultiD_Wavenet multiple_train(MultiD_Wavenet target, int epochs, int ciritical_epochs, int aeras, int critical_aeras);
 	MultiD_Wavenet multiple_train_with_exit(int inp, int hid, int out, Wavelet motherfunction, int epochs, int ciritical_epochs, int aeras);
+	void collect_output(string output, MultiD_Wavenet trainee);
+	void collect_output_chained(string output, MultiD_Wavenet trainee, int chain_factor);
 };

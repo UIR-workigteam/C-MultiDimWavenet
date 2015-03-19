@@ -1,8 +1,10 @@
 // CAcceleration.cpp : Defines the entry point for the console application.
 //
+#include "stdafx.h"
 #include "Wavelon.h"
 #include "MultiD_Wavenet.h"
 #include <time.h>
+
 
 void current_custom_logger(MatrixXd target)
 {

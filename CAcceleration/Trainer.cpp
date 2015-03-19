@@ -4,11 +4,13 @@
 #include <string>
 #include <algorithm>    // copy
 #include <iterator>     // ostream_operator
-
+#include "stdafx.h"
 #include "MultiD_Wavenet.h"
 #include "Trainer.h"
 
+
 #define validation_split 0.75
+
 
 Trainer::Trainer(string input, string output)
 {
@@ -96,10 +98,12 @@ void Trainer::chained_example_comparison(MultiD_Wavenet current_wavenet, int cha
 {
 	float error_sum = 0.0;
 	int validation_len = validation_input.size();
+	int output_vector_len = validation_target.front().cols();
 	list<double> chain_ignition;
 	for (int i = 0; i < chain_count; i++)
 	{
-		chain_ignition.push_front(current_wavenet.forward(validation_input[i])(0, 0));
+		for (int j = 0; j < output_vector_len; j++)
+			chain_ignition.push_front(current_wavenet.forward(validation_input[i])(0, j));
 	}
 
 	for (int i = chain_count; i < validation_len; i++)
@@ -111,8 +115,11 @@ void Trainer::chained_example_comparison(MultiD_Wavenet current_wavenet, int cha
 			temp_input(0, j) = *it++;
 		}
 		MatrixXd current_result = current_wavenet.forward(temp_input);
-		chain_ignition.push_front(current_result(0, 0));
-		chain_ignition.pop_back();
+		for (int j = 0; j < output_vector_len; j++)
+		{
+			chain_ignition.push_front(current_result(0, j));
+			chain_ignition.pop_back();
+		}
 		error_sum += abs((current_result - validation_target[i]).mean());
 		cout << current_result << endl << validation_target[i] << endl << endl;
 	}
@@ -218,4 +225,53 @@ MultiD_Wavenet Trainer::multiple_train_with_exit(int inp, int hid, int out, Wave
 	}
 	chained_example_comparison(global_minimum_network, 3);
 	return global_minimum_network;
+}
+
+void Trainer::collect_output(string output, MultiD_Wavenet trainee)
+{
+	ofstream myfile;
+	myfile.open(output + ".csv");
+
+	int validation_len = validation_input.size();
+	for (int i = 0; i < validation_len; i++)
+	{
+		MatrixXd current_result = trainee.forward(validation_input[i]);
+		myfile << current_result << endl;
+	}
+	myfile.close();
+}
+
+
+void Trainer::collect_output_chained(string output, MultiD_Wavenet trainee, int chain_factor)
+{
+	ofstream myfile;
+	myfile.open(output + ".csv");
+
+	int validation_len = validation_input.size();
+	int output_vector_len = validation_target.front().cols();
+	list<double> chain_ignition;
+	for (int i = 0; i < chain_factor; i++)
+	{
+		for (int j = 0; j < output_vector_len; j++)
+			chain_ignition.push_front(trainee.forward(validation_input[i])(0, j));
+	}
+
+	for (int i = chain_factor; i < validation_len; i++)
+	{
+		MatrixXd temp_input = validation_input[i];
+		list<double>::iterator it = chain_ignition.begin();
+		for (int j = 0; j < chain_factor; j++)
+		{
+			temp_input(0, j) = *it++;
+		}
+		MatrixXd current_result = trainee.forward(temp_input);
+		for (int j = 0; j < output_vector_len; j++)
+		{
+			chain_ignition.push_front(current_result(0, j));
+			chain_ignition.pop_back();
+		}
+		myfile << current_result << endl;
+	}
+
+	myfile.close();
 }

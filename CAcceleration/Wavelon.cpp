@@ -1,4 +1,6 @@
+#include "stdafx.h"
 #include "Wavelon.h"
+
 
 float Wavelet::mhat_function(float inp)
 {
